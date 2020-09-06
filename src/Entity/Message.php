@@ -2,14 +2,21 @@
 
 namespace App\Entity;
 
-use App\Repository\ParticipantRepository;
+use App\Repository\MessageRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 
 /**
- * @ORM\Entity(repositoryClass=ParticipantRepository::class)
+ * @ORM\Entity(repositoryClass=MessageRepository::class)
+ * @ORM\Table(indexes={
+ *     @Index(name="created_at_index", columns={"created_at"})
+ * })
+ * @ORM\HasLifecycleCallbacks()
  */
-class Participant
+class Message
 {
+    use Timestamp;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -18,18 +25,37 @@ class Participant
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="participants")
+     * @ORM\Column(type="text")
+     */
+    private $content;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="messages")
      */
     private $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Conversation", inversedBy="participants")
+     * @ORM\ManyToOne(targetEntity="Conversation", inversedBy="messages")
      */
     private $conversation;
+
+
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getContent(): ?string
+    {
+        return $this->content;
+    }
+
+    public function setContent(string $content): self
+    {
+        $this->content = $content;
+
+        return $this;
     }
 
     public function getUser(): ?User
